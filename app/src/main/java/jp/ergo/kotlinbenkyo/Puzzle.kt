@@ -1,7 +1,5 @@
 package jp.ergo.kotlinbenkyo
 
-import java.util.Arrays.asList
-
 
 class Main {
     companion object {
@@ -24,53 +22,74 @@ enum class Direction(val rawValue: Int) {
 }
 
 
-data class Address(val x: Int, val y: Int)
-data class Masu(val address: Address, val direction: Direction?)
-
-class Field private constructor(val masus: List<Masu>) {
-    fun get(address: Address): Masu? {
-        return null
+data class Address(val x: Int, val y: Int) {
+    fun right(): Address? {
+        return when (x) {
+            4 -> null
+            else -> Address(x + 1, y)
+        }
     }
 
-    fun nextTo(address: Address): Masu? {
-        return null
+    fun left(): Address? {
+        return when (x) {
+            0 -> null
+            else -> Address(x - 1, y)
+        }
     }
 
-    fun remove(masus: List<Masu>): Field {
-        return ???
+    fun down(): Address? {
+        return when (y) {
+            4 -> null
+            else -> Address(x, y + 1)
+        }
     }
 
-    fun update() {
-
+    fun up(): Address? {
+        return when (y) {
+            0 -> null
+            else -> Address(x, y - 1)
+        }
     }
-    
+
+}
+
+class Field private constructor(val masus: Map<Address, Direction>) {
+
+    fun nextTo(address: Address): Address? {
+        return when (masus[address]) {
+            Direction.RIGHT -> address.right()
+            Direction.DOWN -> address.down()
+            Direction.LEFT -> address.left()
+            Direction.UP -> address.up()
+            else -> null
+
+        }
+    }
+
+    fun remove(address: List<Address>): Field{
+        ???
+    }
+
     companion object FieldFactory {
         fun create5x5Field(rawDirections: List<Int>): Field? {
-            if(rawDirections.size == 25) return null
-            val masus = (0..4).map{x -> (0..4).map{y -> Pair(x,y)}}.flatten().zip(rawDirections.map{Direction.of(it)}){pair, direction -> Masu(Address(pair.first, pair.second), direction)}
+            if (rawDirections.size != 25) return null
+            val directions = rawDirections.map { Direction.of(it)!! }
+            val addresses = (0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten()
+            val masus = addresses.zip(directions, ::Pair).associate { it.first to it.second }
             return Field(masus)
         }
     }
-    
-    fun hoge(address: Address): List<Masu> {
-        var address = address
-        val list = ArrayList<Masu>()
-        while(address != null){
-            list.add(get(address)!!)
-            address = nextTo(address)!!.address
-        }
-        return list
-    }
-    
-    fun trace(address:Address): List<Masu> {
+
+    fun trace(address: Address): List<Address> {
         return trace(listOf(), address)
     }
-    
-    private fun trace(acc: List<Masu>, address: Address): List<Masu> {
+
+    private fun trace(acc: List<Address>, address: Address): List<Address> {
         val next = nextTo(address)
+        println(next)
         return when (next) {
             null -> acc
-            else -> trace(acc + (next), next.address)
+            else -> trace(acc + (next), next)
         }
     }
 }

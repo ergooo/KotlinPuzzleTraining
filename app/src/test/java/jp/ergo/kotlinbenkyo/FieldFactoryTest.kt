@@ -12,7 +12,12 @@ class FieldFactoryTest {
         val actual = Field.FieldFactory.create5x5Field(testData)
         println(actual)
         actual?.let { it.masus.forEach { println(it) } }
-        
+
+        actual?.let {
+            val list = it.trace(Address(0,0))
+            println("lis: " + list)
+        }
+
     }
 
 }

@@ -160,6 +160,9 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
         }
     }
 
+    fun collapseFrom(address: Address): Field {
+        return removedField(trace(address)).moveDownField().moveLeftField()
+    }
 
     override fun toString(): String {
         return "Field(masus=$masus)"

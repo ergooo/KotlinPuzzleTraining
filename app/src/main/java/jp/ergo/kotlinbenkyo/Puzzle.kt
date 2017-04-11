@@ -61,7 +61,7 @@ data class Address(val x: Int, val y: Int) {
 
 }
 
-class Field private constructor(val masus: Map<Address, Direction?>) {
+class Field internal constructor(val masus: Map<Address, Direction?>) {
 
     fun nextTo(address: Address): Address? {
         return when (masus[address]) {
@@ -78,24 +78,45 @@ class Field private constructor(val masus: Map<Address, Direction?>) {
         return Field(removedMasus)
     }
 
-    fun moveDown(masus: Map<Address, Direction?>): Map<Address, Direction?> {
-//        // 変更のあった要素のMapのリスト
-//        val changed: List<Map<Address?, Direction?>> = masus.filter { masus[it.key.down()] == null }.map { mapOf(Pair(it.key, null), Pair(it.key.down(), it.value)) }
-//        
-//        val changed2 = changed.associate { Pair(it.map { it.key }.first(), it.map { it.value }.first()) }
-//        
-//        // 変更のあったAddressのリスト
-//        val changedAddress = changed.map { listOf(it.first.first, it.second.first) }.flatten()
-//        // 変更の無かったAddressのリストとマージ
-//        val notChangedAddress = masus.filterNot { changedAddress.contains(it.key) }
-//        val downMasus = masus.map { it -> Pair(it.key, if (masus[it.key.down()] == null) null else it.value) }.associate { it.first to it.second }
-//        return if (downMasus.filter { downMasus[it.key.down()] == null }.isEmpty()) downMasus else moveDown(downMasus)
-
-        val changed: List<Pair<Address?, Direction?>> = masus.filter { masus[it.key.down()] == null && !it.key.isBottomEdge() }.map { listOf(Pair(it.key, null), Pair(it.key.down(), it.value)) }.flatten()
-        val changedMap = changed.associate { it.first!! to it.second }
-        return masus.filterNot { changedMap.contains(it.key) }.plus(changedMap)
+    fun moveDownField(): Field {
+        return moveField(masus, canDown, slideDown)
     }
 
+    tailrec fun moveField(masus: Map<Address, Direction?>,
+                  canMove: (Map<Address, Direction?>, Address) -> Boolean,
+                  slide: (Address, Direction?) -> List<Pair<Address, Direction?>>): Field {
+        val filtered = masus.filter { canMove(masus, it.key) }
+        return when {
+            filtered.isEmpty() -> Field(masus)
+            else -> {
+                // 変更があった要素のMap
+                val changedMap = filtered.map { slide(it.key, it.value) }.flatten().associate { it.first!! to it.second }
+                // 変更のなかった要素とマージ
+                val merged = masus.filterNot { changedMap.contains(it.key) } + changedMap
+                moveField(merged, canMove, slide)
+            }
+        }
+    }
+
+    val slideDown: (Address, Direction?) -> List<Pair<Address, Direction?>> = { address: Address, direction: Direction? ->
+        listOf(address to null, address.down()!! to direction)
+    }
+
+    val canDown: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
+        masus[address.down()] == null && !address.isBottomEdge()
+    }
+
+    fun moveLeftField(): Field {
+        return moveField(masus, canLeft, slideLeft)
+    }
+
+    val slideLeft: (Address, Direction?) ->  List<Pair<Address, Direction?>> = {address: Address, direction: Direction? ->
+        listOf(address to null, address.left()!! to direction)
+    }
+
+    val canLeft: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
+        masus[address.left()] == null && !address.isLeftEdge()
+    }
 
     companion object FieldFactory {
         fun create5x5Field(rawDirections: List<Int>): Field? {
@@ -118,5 +139,24 @@ class Field private constructor(val masus: Map<Address, Direction?>) {
             null -> acc
             else -> trace(acc + (next), next)
         }
+    }
+
+    override fun toString(): String {
+        return "Field(masus=$masus)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other?.javaClass != javaClass) return false
+
+        other as Field
+
+        if (masus != other.masus) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return masus.hashCode()
     }
 }

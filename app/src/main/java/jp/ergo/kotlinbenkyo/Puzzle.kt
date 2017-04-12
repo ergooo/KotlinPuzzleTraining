@@ -3,7 +3,7 @@ package jp.ergo.kotlinbenkyo
 
 class Main {
     companion object {
-        fun main(directions: List<Int>) {            
+        fun main(directions: List<Int>) {
         }
 
 
@@ -158,12 +158,12 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     tailrec private fun trace(acc: List<Address>, address: Address): List<Address> {
-        val next = nextTo(address)
+        val nextAddress = nextTo(address)
         return when {
-            next == null -> acc
-            masus[next] == null -> acc
-            acc.contains(next) -> acc
-            else -> trace(acc + (next), next)
+            nextAddress == null -> acc // 端っこに来たのでaccをそのまま返す
+            masus[nextAddress] == null -> acc // 次Directionがないのでそこでおしまい
+            acc.contains(nextAddress) -> acc // 既に辿ったところなのでそこで終了
+            else -> trace(acc + nextAddress, nextAddress)
         }
     }
 

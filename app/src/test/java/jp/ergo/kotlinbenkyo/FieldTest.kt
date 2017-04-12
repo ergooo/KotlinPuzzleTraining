@@ -1,11 +1,11 @@
 package jp.ergo.kotlinbenkyo
 
-import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsNull
 import org.junit.Test
 
-class FieldFactoryTest {
+class FieldTest {
     @Test
     fun collapseFromTest() {
         val testData = "0000120011333113332133222"
@@ -97,6 +97,34 @@ class FieldFactoryTest {
                 Address(0, 1),
                 Address(0, 2),
                 Address(0, 3))
+        assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun testTraceは向き合ったDirection同士で無限ループにならない() {
+        val testData = mapOf(
+                Address(0, 0) to Direction.DOWN,
+                Address(0, 1) to Direction.UP
+        )
+        val sut = Field(testData)
+        val actual = sut.trace(Address(0, 0))
+        assertThat(actual, `is`(not(nullValue())))
+    }
+
+    @Test
+    fun testTraceは一度辿ったアドレスはカウントせずそこで終わる() {
+        val testData = mapOf(
+                Address(0, 0) to Direction.DOWN,
+                Address(0, 1) to Direction.UP,
+                Address(0, 2) to Direction.DOWN,
+                Address(0, 3) to Direction.DOWN,
+                Address(0, 4) to null
+        )
+        val sut = Field(testData)
+        val actual = sut.trace(Address(0, 0))
+        val expect = listOf(
+                Address(0, 0),
+                Address(0, 1))
         assertThat(actual, `is`(expect))
     }
 

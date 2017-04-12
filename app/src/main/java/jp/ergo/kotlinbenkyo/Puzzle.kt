@@ -3,9 +3,15 @@ package jp.ergo.kotlinbenkyo
 
 class Main {
     companion object {
-        fun main(directions: List<Int>) {
+        fun main(directions: List<Int>) {            
+        }
+
+
+        fun convertInput(input: String): List<Int> {
+            return input.map { it.toString().toInt() }
         }
     }
+
 }
 
 enum class Direction(val rawValue: Int) {
@@ -98,8 +104,8 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return 自身のMasus内にcanMoveに適合する要素が含まれている場合、再帰的にslideに適応させた要素で置き換えたFieldを返す。
      */
     tailrec private fun moveField(masus: Map<Address, Direction?>,
-                          canMove: (Map<Address, Direction?>, Address) -> Boolean,
-                          slide: (Address, Direction?) -> List<Pair<Address, Direction?>>): Field {
+                                  canMove: (Map<Address, Direction?>, Address) -> Boolean,
+                                  slide: (Address, Direction?) -> List<Pair<Address, Direction?>>): Field {
         val filtered = masus.filter { canMove(masus, it.key) }
         return when {
             filtered.isEmpty() -> Field(masus)
@@ -126,7 +132,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     private val canDown: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
-        masus[address.down()] == null && !address.isBottomEdge()
+        masus[address] != null && masus[address.down()] == null && !address.isBottomEdge()
     }
 
     /**
@@ -141,7 +147,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     private val canLeft: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
-        masus[address.left()] == null && !address.isLeftEdge()
+        masus[address] != null && masus[address.left()] == null && !address.isLeftEdge()
     }
 
     /**
@@ -156,6 +162,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
         return when {
             next == null -> acc
             masus[next] == null -> acc
+            acc.contains(next) -> acc
             else -> trace(acc + (next), next)
         }
     }

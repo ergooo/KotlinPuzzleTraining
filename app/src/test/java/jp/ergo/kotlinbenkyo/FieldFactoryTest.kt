@@ -2,9 +2,28 @@ package jp.ergo.kotlinbenkyo
 
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.core.IsNull
 import org.junit.Test
 
 class FieldFactoryTest {
+    @Test
+    fun collapseFromTest() {
+        val testData = "0000120011333113332133222"
+        val sut = Field.create5x5Field(Main.convertInput(testData))
+        val actual = sut!!.collapseFrom(Address(0, 0))
+
+        assertThat(actual.masus[Address(3, 0)], IsNull())
+        assertThat(actual.masus[Address(4, 0)], IsNull())
+    }
+
+    @Test
+    fun convertInputTest() {
+        val testData = "0000120011333113332133222"
+        val actual = Main.convertInput(testData)
+        val expect = listOf(0, 0, 0, 0, 1, 2, 0, 0, 1, 1, 3, 3, 3, 1, 1, 3, 3, 3, 2, 1, 3, 3, 2, 2, 2)
+        assertThat(actual, `is`(expect))
+    }
+
     @Test
     fun create5x5FieldTest() {
         val testData = (0..24).map { 1 }

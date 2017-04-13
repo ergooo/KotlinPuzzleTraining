@@ -1,19 +1,6 @@
 package jp.ergo.kotlinbenkyo
 
 
-class Main {
-    companion object {
-        fun main(directions: List<Int>) {
-        }
-
-
-        fun convertInput(input: String): List<Int> {
-            return input.map { it.toString().toInt() }
-        }
-    }
-
-}
-
 enum class Direction(val rawValue: Int) {
     RIGHT(0),
     DOWN(1),

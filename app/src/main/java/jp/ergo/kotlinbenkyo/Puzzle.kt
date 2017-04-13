@@ -1,5 +1,7 @@
 package jp.ergo.kotlinbenkyo
 
+import io.michaelrocks.optional.toOptional
+
 
 enum class Direction(val rawValue: Int) {
     RIGHT(0),
@@ -10,6 +12,15 @@ enum class Direction(val rawValue: Int) {
     companion object {
         fun of(rawValue: Int): Direction? {
             return Direction.values().filter { it.rawValue == rawValue }.firstOrNull()
+        }
+    }
+
+    fun toAllow(): String {
+        return when (this) {
+            RIGHT -> "→"
+            DOWN -> "↓"
+            LEFT -> "←"
+            UP -> "↑"
         }
     }
 }
@@ -160,6 +171,24 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
 
     fun availableAddress(): List<Address> {
         return masus.filter { it.value != null }.map { it.key }
+    }
+
+    fun toAllowSquare(): String {
+        val address = (0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten()
+        val directions = (0..24).map{null}
+        val nullMasus: Map<Address, Direction?> = address.zip(directions, ::Pair).toMap()
+
+        val sorted = (nullMasus + masus).toList().sortedWith(Comparator { left, right -> right.first.y*5+right.first.x - left.first.y*5+left.first.x })
+        sorted.forEach { println(it.first) }
+
+        return sorted.fold("", { acc, pair ->
+            val direction = if(pair.second != null) pair.second!!.toAllow() else "ー"
+            println("direction: " + direction)
+            when (pair.first.y) {
+                4 -> acc + direction + "\n"
+                else -> acc + direction + " "
+            }
+        })
     }
 
     override fun toString(): String {

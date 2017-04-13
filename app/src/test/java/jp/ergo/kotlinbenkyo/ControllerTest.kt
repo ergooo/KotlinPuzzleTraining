@@ -13,4 +13,12 @@ class ControllerTest {
         val expect = listOf(0, 0, 0, 0, 1, 2, 0, 0, 1, 1, 3, 3, 3, 1, 1, 3, 3, 3, 2, 1, 3, 3, 2, 2, 2)
         MatcherAssert.assertThat(actual, CoreMatchers.`is`(expect))
     }
+
+    @Test
+    fun toCollapsedMap(){
+        val testInput = "0000120011333113332133222"
+        val testData = Field.create5x5Field(Controller.convertInput(testInput))!!
+        val actual = Controller.toCollapsedMap(testData)
+        println(actual.size)
+    }
 }

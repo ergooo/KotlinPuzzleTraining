@@ -53,7 +53,7 @@ class FieldTest {
     }
 
     @Test
-    fun removeFieldTest() {
+    fun removeFieldは指定したAddressのDirectionをnullに変える() {
         val testData = mapOf(
                 Address(0, 0) to Direction.DOWN,
                 Address(0, 1) to Direction.DOWN,
@@ -181,5 +181,15 @@ class FieldTest {
                 Address(4,0)
         )
         assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun toAllowSquareTest(){
+        val testData = "0000120011333113332133222"
+        val sut = Field.create5x5Field(Controller.convertInput(testData))
+        val before = sut!!.toAllowSquare()
+        println(before)
+        val after = sut!!.collapseFrom(Address(0,0)).toAllowSquare()
+        println(after)
     }
 }

@@ -7,9 +7,8 @@ class Controller {
             return input.map { it.toString().toInt() }
         }
 
-//        fun x(field: Field): Map<Address, Field>{
-//            val availableAddress = field.availableAddress()
-//            availableAddress.map{}
-//        }
+        fun toCollapsedMap(field: Field): Map<Address, Field>{
+            return field.availableAddress().map{it to field.collapseFrom(it)}.toMap()
+        }
     }
 }

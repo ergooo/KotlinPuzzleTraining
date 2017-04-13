@@ -171,6 +171,10 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
         return removedField(trace(address)).moveDownField().moveLeftField()
     }
 
+    fun availableAddress(): List<Address> {
+        return masus.filter { it.value != null }.map { it.key }
+    }
+
     override fun toString(): String {
         return "Field(masus=$masus)"
     }

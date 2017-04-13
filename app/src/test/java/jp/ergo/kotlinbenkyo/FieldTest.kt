@@ -172,5 +172,22 @@ class FieldTest {
         assertThat(actual, `is`(expect))
     }
 
-
+    @Test
+    fun availableAddressはDirectionがnullでないAddressのリストを返却する() {
+        val testData = mapOf(
+                Address(0, 0) to null,
+                Address(1, 0) to Direction.DOWN,
+                Address(2, 0) to Direction.DOWN,
+                Address(3, 0) to null,
+                Address(4, 0) to Direction.DOWN
+        )
+        val sut = Field(testData)
+        val actual = sut.availableAddress()
+        val expect = listOf(
+                Address(1,0),
+                Address(2,0),
+                Address(4,0)
+        )
+        assertThat(actual, `is`(expect))
+    }
 }

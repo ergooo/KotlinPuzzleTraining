@@ -61,7 +61,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
             if (rawDirections.size != 25) return null
             val directions = rawDirections.map { Direction.of(it) }
             val addresses = (0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten()
-            val masus = addresses.zip(directions, ::Pair).associate { it.first to it.second }
+            val masus = addresses.zip(directions, ::Pair).toMap()
             return Field(masus)
         }
     }
@@ -83,7 +83,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return 指定したアドレスリストのDirectionをnullにしたFieldを返す。
      */
     fun removedField(address: List<Address>): Field {
-        val removedMasus = masus.map { Pair(it.key, if (address.contains(it.key)) null else it.value) }.associate { it.first to it.second }
+        val removedMasus = masus.map { Pair(it.key, if (address.contains(it.key)) null else it.value) }.toMap()
         return Field(removedMasus)
     }
 
@@ -98,7 +98,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
             filtered.isEmpty() -> Field(masus)
             else -> {
                 // 変更があった要素のMap
-                val changedMap = filtered.map { slide(it.key, it.value) }.flatten().associate { it.first!! to it.second }
+                val changedMap = filtered.map { slide(it.key, it.value) }.flatten().toMap()
                 // 変更のなかった要素とマージ
                 val merged = masus.filterNot { changedMap.contains(it.key) } + changedMap
                 moveField(merged, canMove, slide)

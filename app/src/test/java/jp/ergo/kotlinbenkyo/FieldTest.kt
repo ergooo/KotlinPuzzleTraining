@@ -176,51 +176,84 @@ class FieldTest {
         val sut = Field(testData)
         val actual = sut.availableAddress()
         val expect = listOf(
-                Address(1,0),
-                Address(2,0),
-                Address(4,0)
+                Address(1, 0),
+                Address(2, 0),
+                Address(4, 0)
         )
         assertThat(actual, `is`(expect))
     }
 
     @Test
-    fun toArrowSquareTest(){
+    fun toArrowSquareTest() {
         val testData = "0000120011333113332133222"
         val sut = Field.create5x5Field(Controller.convertInput(testData))
-        val before = sut!!.toArrowSquare()
-        println(before)
-        val after = sut!!.collapseFrom(Address(0,0)).toArrowSquare()
-        println(after)
+        val actual = sut!!.collapseFrom(Address(0, 0)).toArrowSquare().trim()
+        val expect = """
+↑ ↑ ↑ - -
+→ → ↑ ↑ ↑
+→ → ↑ ↑ ←
+→ ↓ ↓ ← ←
+↓ ↓ ↓ ↓ ←
+""".trim()
+        assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun isEmptyはDirectionが全部nullの場合にtrueを返す() {
+        val testData = mapOf(
+                Address(0, 0) to null,
+                Address(0, 1) to null,
+                Address(0, 2) to null,
+                Address(0, 3) to null,
+                Address(0, 4) to null
+        )
+        val sut = Field(testData)
+        val actual = sut.isEmpty()
+        assertThat(actual, `is`(true))
+    }
+
+    @Test
+    fun isEmptyはDirectionが全部nullでない場合にfalseを返す() {
+        val testData = mapOf(
+                Address(0, 0) to Direction.DOWN,
+                Address(1, 0) to Direction.DOWN,
+                Address(2, 0) to Direction.DOWN,
+                Address(3, 0) to Direction.DOWN,
+                Address(0, 4) to null
+        )
+        val sut = Field(testData)
+        val actual = sut.isEmpty()
+        assertThat(actual, `is`(false))
     }
 }
 
 class AddressTest {
     @Test
     fun originは位置をIntで返す() {
-        assertThat(Address(0,0).origin(), `is`(0))
-        assertThat(Address(1,0).origin(), `is`(1))
-        assertThat(Address(2,0).origin(), `is`(2))
-        assertThat(Address(3,0).origin(), `is`(3))
-        assertThat(Address(4,0).origin(), `is`(4))
-        assertThat(Address(0,1).origin(), `is`(5))
-        assertThat(Address(1,1).origin(), `is`(6))
-        assertThat(Address(2,1).origin(), `is`(7))
-        assertThat(Address(3,1).origin(), `is`(8))
-        assertThat(Address(4,1).origin(), `is`(9))
-        assertThat(Address(0,2).origin(), `is`(10))
-        assertThat(Address(1,2).origin(), `is`(11))
-        assertThat(Address(2,2).origin(), `is`(12))
-        assertThat(Address(3,2).origin(), `is`(13))
-        assertThat(Address(4,2).origin(), `is`(14))
-        assertThat(Address(0,3).origin(), `is`(15))
-        assertThat(Address(1,3).origin(), `is`(16))
-        assertThat(Address(2,3).origin(), `is`(17))
-        assertThat(Address(3,3).origin(), `is`(18))
-        assertThat(Address(4,3).origin(), `is`(19))
-        assertThat(Address(0,4).origin(), `is`(20))
-        assertThat(Address(1,4).origin(), `is`(21))
-        assertThat(Address(2,4).origin(), `is`(22))
-        assertThat(Address(3,4).origin(), `is`(23))
-        assertThat(Address(4,4).origin(), `is`(24))
+        assertThat(Address(0, 0).origin(), `is`(0))
+        assertThat(Address(1, 0).origin(), `is`(1))
+        assertThat(Address(2, 0).origin(), `is`(2))
+        assertThat(Address(3, 0).origin(), `is`(3))
+        assertThat(Address(4, 0).origin(), `is`(4))
+        assertThat(Address(0, 1).origin(), `is`(5))
+        assertThat(Address(1, 1).origin(), `is`(6))
+        assertThat(Address(2, 1).origin(), `is`(7))
+        assertThat(Address(3, 1).origin(), `is`(8))
+        assertThat(Address(4, 1).origin(), `is`(9))
+        assertThat(Address(0, 2).origin(), `is`(10))
+        assertThat(Address(1, 2).origin(), `is`(11))
+        assertThat(Address(2, 2).origin(), `is`(12))
+        assertThat(Address(3, 2).origin(), `is`(13))
+        assertThat(Address(4, 2).origin(), `is`(14))
+        assertThat(Address(0, 3).origin(), `is`(15))
+        assertThat(Address(1, 3).origin(), `is`(16))
+        assertThat(Address(2, 3).origin(), `is`(17))
+        assertThat(Address(3, 3).origin(), `is`(18))
+        assertThat(Address(4, 3).origin(), `is`(19))
+        assertThat(Address(0, 4).origin(), `is`(20))
+        assertThat(Address(1, 4).origin(), `is`(21))
+        assertThat(Address(2, 4).origin(), `is`(22))
+        assertThat(Address(3, 4).origin(), `is`(23))
+        assertThat(Address(4, 4).origin(), `is`(24))
     }
 }

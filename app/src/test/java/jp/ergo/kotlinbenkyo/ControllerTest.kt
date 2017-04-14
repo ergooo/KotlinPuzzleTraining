@@ -1,7 +1,9 @@
 package jp.ergo.kotlinbenkyo
 
 import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Test
 
 class ControllerTest {
@@ -15,10 +17,35 @@ class ControllerTest {
     }
 
     @Test
-    fun toCollapsedMap(){
+    fun toCollapsedMap() {
         val testInput = "0000120011333113332133222"
         val testData = Field.create5x5Field(Controller.convertInput(testInput))!!
         val actual = Controller.toCollapsedMap(testData)
-        println(actual.size)
+        val testDataSquare = """
+→ ← ↑ ↑ ↑
+→ → ↑ ↑ ↑
+→ → ↑ ↑ ←
+→ ↓ ↓ ← ←
+↓ ↓ ↓ ↓ ←
+        """.trim()
+        assertThat(testData.toArrowSquare().trim(), `is`(testDataSquare))
+
+        val actual00 = """
+↑ ↑ ↑ - -
+→ → ↑ ↑ ↑
+→ → ↑ ↑ ←
+→ ↓ ↓ ← ←
+↓ ↓ ↓ ↓ ←
+        """.trim()
+        assertThat(actual[Address(0, 0)]!!.toArrowSquare().trim(), `is`(actual00))
+
+        val actual01 = """
+↑ ↑ - - -
+→ ← ↑ ↑ -
+→ → ↑ ↑ ←
+→ ↓ ↓ ← ←
+↓ ↓ ↓ ↓ ←
+""".trim()
+        assertThat(actual[Address(0, 1)]!!.toArrowSquare().trim(), `is`(actual01))
     }
 }

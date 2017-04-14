@@ -1,5 +1,8 @@
 package jp.ergo.kotlinbenkyo
 
+import io.michaelrocks.optional.isNone
+import io.michaelrocks.optional.toOptional
+
 
 enum class Direction(val rawValue: Int) {
     RIGHT(0),
@@ -173,6 +176,13 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
 
     fun availableAddress(): List<Address> {
         return masus.filter { it.value != null }.map { it.key }
+    }
+
+    /**
+     * @return Directionが全てnullであればtrue
+     */
+    fun isEmpty(): Boolean {
+        return masus.filter{it.value != null}.isEmpty()
     }
 
     /**

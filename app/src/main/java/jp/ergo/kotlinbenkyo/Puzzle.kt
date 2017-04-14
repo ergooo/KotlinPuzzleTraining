@@ -1,7 +1,5 @@
 package jp.ergo.kotlinbenkyo
 
-import io.michaelrocks.optional.toOptional
-
 
 enum class Direction(val rawValue: Int) {
     RIGHT(0),
@@ -15,7 +13,7 @@ enum class Direction(val rawValue: Int) {
         }
     }
 
-    fun toAllow(): String {
+    fun toArrow(): String {
         return when (this) {
             RIGHT -> "→"
             DOWN -> "↓"
@@ -61,6 +59,10 @@ data class Address(val x: Int, val y: Int) {
 
     fun isLeftEdge(): Boolean {
         return x == 0
+    }
+
+    fun origin(): Int {
+        return y * 5 + x
     }
 
 }
@@ -173,20 +175,24 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
         return masus.filter { it.value != null }.map { it.key }
     }
 
-    fun toAllowSquare(): String {
+    /**
+     * 目視確認用。こんな感じの文字列にする
+     * → ← ↑ ↑ ↑
+     * → → ↑ ↑ ↑
+     * → → ↑ ↑ ←
+     * → ↓ ↓ ← ←
+     * ↓ ↓ ↓ ↓ ←
+     */
+    fun toArrowSquare(): String {
         val address = (0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten()
-        val directions = (0..24).map{null}
+        val directions = (0..24).map { null }
         val nullMasus: Map<Address, Direction?> = address.zip(directions, ::Pair).toMap()
-
-        val sorted = (nullMasus + masus).toList().sortedWith(Comparator { left, right -> right.first.y*5+right.first.x - left.first.y*5+left.first.x })
-        sorted.forEach { println(it.first) }
-
+        val sorted = (nullMasus + masus).toList().sortedWith(Comparator { left, right -> left.first.origin() - right.first.origin() })
         return sorted.fold("", { acc, pair ->
-            val direction = if(pair.second != null) pair.second!!.toAllow() else "ー"
-            println("direction: " + direction)
-            when (pair.first.y) {
-                4 -> acc + direction + "\n"
-                else -> acc + direction + " "
+            val arrow = if (pair.second != null) pair.second!!.toArrow() else "-"
+            when (pair.first.x) {
+                4 -> acc + arrow + "\n"
+                else -> acc + arrow + " "
             }
         })
     }

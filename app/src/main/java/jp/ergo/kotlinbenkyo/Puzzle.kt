@@ -1,8 +1,5 @@
 package jp.ergo.kotlinbenkyo
 
-import io.michaelrocks.optional.isNone
-import io.michaelrocks.optional.toOptional
-
 
 enum class Direction(val rawValue: Int) {
     RIGHT(0),
@@ -72,7 +69,7 @@ data class Address(val x: Int, val y: Int) {
 
 class Field internal constructor(val masus: Map<Address, Direction?>) {
 
-    companion object FieldFactory {
+    companion object {
         fun create5x5Field(rawDirections: List<Int>): Field? {
             if (rawDirections.size != 25) return null
             val directions = rawDirections.map { Direction.of(it) }
@@ -80,6 +77,8 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
             val masus = addresses.zip(directions, ::Pair).toMap()
             return Field(masus)
         }
+
+        val EMPTY = Field((0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten().zip((0..24).map { null as Direction? }, ::Pair).toMap())
     }
 
     /**
@@ -182,7 +181,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return Directionが全てnullであればtrue
      */
     fun isEmpty(): Boolean {
-        return masus.filter{it.value != null}.isEmpty()
+        return masus.filter { it.value != null }.isEmpty()
     }
 
     /**

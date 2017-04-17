@@ -37,7 +37,7 @@ class ControllerTest {
 → ↓ ↓ ← ←
 ↓ ↓ ↓ ↓ ←
         """.trim()
-        assertThat(actual[Address(0, 0)]!!.toArrowSquare().trim(), `is`(actual00))
+        assertThat(actual.filter { it.value == Address(1,0) }.keys.first().toArrowSquare().trim(), `is`(actual00))
 
         val actual01 = """
 ↑ ↑ - - -
@@ -46,6 +46,6 @@ class ControllerTest {
 → ↓ ↓ ← ←
 ↓ ↓ ↓ ↓ ←
 """.trim()
-        assertThat(actual[Address(0, 1)]!!.toArrowSquare().trim(), `is`(actual01))
+        assertThat(actual.filter { it.value == Address(0,1) }.keys.first().toArrowSquare().trim(), `is`(actual01))
     }
 }

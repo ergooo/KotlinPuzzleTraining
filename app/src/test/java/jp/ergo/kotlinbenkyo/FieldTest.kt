@@ -20,7 +20,7 @@ class FieldTest {
     fun create5x5FieldTest() {
         val testData = (0..24).map { 1 }
         assertThat(testData.size, `is`(25))
-        val actual = Field.FieldFactory.create5x5Field(testData)
+        val actual = Field.create5x5Field(testData)
         val expect = Field(mapOf(
                 Address(0, 0) to Direction.DOWN,
                 Address(0, 1) to Direction.DOWN,
@@ -224,6 +224,21 @@ class FieldTest {
         val sut = Field(testData)
         val actual = sut.isEmpty()
         assertThat(actual, `is`(false))
+    }
+
+    @Test
+    fun EMPTYはすべてのDirectionがnullである() {
+        val sut = Field.EMPTY
+        sut.masus.values.forEach { assertThat(it, `is`(nullValue())) }
+    }
+
+    @Test
+    fun EMPTYはすべてのDirectionがnullな別インスタンスとイコールで比較した時tureを返す() {
+        val sut = Field.EMPTY
+
+        val expect = Field((0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten().zip((0..24).map { null as Direction? }, ::Pair).toMap())
+        assertThat(sut, `is`(equalTo(expect)))
+
     }
 }
 

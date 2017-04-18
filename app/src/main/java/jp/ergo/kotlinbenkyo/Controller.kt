@@ -7,18 +7,24 @@ fun main(args: Array<String>) {
     val input = "0000120011333113332133222"
     val field = Field.createField(Controller.convertInput(input))!!
 
-    val path = getPath(mapOf(field to listOf()))
+    val path = getPath(field)
     println(path)
 }
 
 
 class Controller {
     companion object {
+
+        fun getPath(field: Field): List<Address> {
+            return getPath(mapOf(field to listOf()))
+        }
+
         fun getPath(collapsedMap: Map<Field, List<Address>>): List<Address> {
             // collapsedMapのField一つ一つにtoCollapsedMapを適用し、それまで辿ってきたAddressを追加する。得られる結果はListである。
             val collapsedMapList: List<Map<Field, List<Address>>> = collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value } }
+
             // collapsedMapListの中にEmptyなやつがいれば即終了
-            val addressesWithEmptyField = collapsedMapList.filter { it[Field.EMPTY] != null }.firstOrNull()?.get(Field.EMPTY)
+            val addressesWithEmptyField = collapsedMapList.filter { it[Field.EMPTY] != null }.firstOrNull()?.get(Field.EMPTY) ?: collapsedMap[Field.EMPTY]
             if (addressesWithEmptyField != null) {
                 return addressesWithEmptyField
             } else {

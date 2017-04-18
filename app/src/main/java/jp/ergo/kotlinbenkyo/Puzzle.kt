@@ -96,16 +96,23 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     companion object {
         fun createField(rawDirections: List<Int>): Field? {
             val sqrt = Math.sqrt(rawDirections.size.toDouble()).toInt()
-            if(rawDirections.size / sqrt != sqrt) throw IllegalArgumentException("リストのサイズは5x5など整数の平方根を取れなければなりません。size: " + rawDirections.size)
+            if (rawDirections.size / sqrt != sqrt) throw IllegalArgumentException("リストのサイズは5x5など整数の平方根を取れなければなりません。size: " + rawDirections.size)
             Config.default = Config(rawDirections.size)
             if (rawDirections.size != Config.default.size) return null
             val directions = rawDirections.map { Direction.of(it) }
-            val addresses = IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten()
+            val addresses = IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten().sortedWith(Comparator { left, right -> left.origin() - right.origin() })
             val masus = addresses.zip(directions, ::Pair).toMap()
             return Field(masus)
         }
 
-        val EMPTY = Field(IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten().zip(IntRange(0, Config.default.size - 1).map { null as Direction? }, ::Pair).toMap())
+        val EMPTY: Field by lazy {
+            Field(IntRange(0, Config.default.bottomEdge)
+                    .map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }
+                    .flatten()
+                    .sortedWith(Comparator { left, right -> left.origin() - right.origin() })
+                    .zip(IntRange(0, Config.default.size - 1).map { null as Direction? }, ::Pair)
+                    .toMap())
+        }
     }
 
     /**

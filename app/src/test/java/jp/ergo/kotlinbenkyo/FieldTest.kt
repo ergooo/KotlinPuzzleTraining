@@ -7,15 +7,16 @@ import org.junit.Before
 import org.junit.Test
 
 class FieldTest {
-    @Before
-    fun setUp() {
-        Config.default = Config(25)
+    @Test(expected = IllegalArgumentException::class)
+    fun createFieldは5x4のサイズの引数を受け取ると例外を投げる() {
+        val testData = "00000000000000000000"
+        Field.createField(Controller.convertInput(testData))
     }
 
     @Test
     fun collapseFromTest() {
         val testData = "0000120011333113332133222"
-        val sut = Field.create5x5Field(Controller.convertInput(testData))
+        val sut = Field.createField(Controller.convertInput(testData))
         val actual = sut!!.collapseFrom(Address(0, 0))
 
         assertThat(actual.masus[Address(3, 0)], IsNull())
@@ -26,7 +27,7 @@ class FieldTest {
     fun create5x5FieldTest() {
         val testData = (0..24).map { 1 }
         assertThat(testData.size, `is`(25))
-        val actual = Field.create5x5Field(testData)
+        val actual = Field.createField(testData)
         val expect = Field(mapOf(
                 Address(0, 0) to Direction.DOWN,
                 Address(0, 1) to Direction.DOWN,
@@ -192,7 +193,7 @@ class FieldTest {
     @Test
     fun toArrowSquareTest() {
         val testData = "0000120011333113332133222"
-        val sut = Field.create5x5Field(Controller.convertInput(testData))
+        val sut = Field.createField(Controller.convertInput(testData))
         val actual = sut!!.collapseFrom(Address(0, 0)).toArrowSquare().trim()
         val expect = """
 ↑ ↑ ↑ - -
@@ -249,11 +250,6 @@ class FieldTest {
 }
 
 class AddressTest {
-    @Before
-    fun setUp() {
-        Config.default = Config(25)
-    }
-
     @Test
     fun originは位置をIntで返す() {
         assertThat(Address(0, 0).origin(), `is`(0))

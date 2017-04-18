@@ -5,7 +5,7 @@ import jp.ergo.kotlinbenkyo.Controller.Companion.getPath
 
 fun main(args: Array<String>) {
     val input = "0000120011333113332133222"
-    val field = Field.create5x5Field(Controller.convertInput(input))!!
+    val field = Field.createField(Controller.convertInput(input))!!
 
     val path = getPath(mapOf(field to listOf()))
     println(path)

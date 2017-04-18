@@ -94,7 +94,10 @@ class Config(val size: Int) {
 class Field internal constructor(val masus: Map<Address, Direction?>) {
 
     companion object {
-        fun create5x5Field(rawDirections: List<Int>): Field? {
+        fun createField(rawDirections: List<Int>): Field? {
+            val sqrt = Math.sqrt(rawDirections.size.toDouble()).toInt()
+            if(rawDirections.size / sqrt != sqrt) throw IllegalArgumentException("リストのサイズは5x5など整数の平方根を取れなければなりません。size: " + rawDirections.size)
+            Config.default = Config(rawDirections.size)
             if (rawDirections.size != Config.default.size) return null
             val directions = rawDirections.map { Direction.of(it) }
             val addresses = IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten()

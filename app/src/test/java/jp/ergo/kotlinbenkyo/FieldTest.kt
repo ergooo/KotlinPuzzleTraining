@@ -3,9 +3,15 @@ package jp.ergo.kotlinbenkyo
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsNull
+import org.junit.Before
 import org.junit.Test
 
 class FieldTest {
+    @Before
+    fun setUp() {
+        Config.default = Config(25)
+    }
+
     @Test
     fun collapseFromTest() {
         val testData = "0000120011333113332133222"
@@ -243,6 +249,11 @@ class FieldTest {
 }
 
 class AddressTest {
+    @Before
+    fun setUp() {
+        Config.default = Config(25)
+    }
+
     @Test
     fun originは位置をIntで返す() {
         assertThat(Address(0, 0).origin(), `is`(0))

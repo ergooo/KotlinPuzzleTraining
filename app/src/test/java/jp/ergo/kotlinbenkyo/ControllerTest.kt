@@ -4,10 +4,15 @@ import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
 import org.hamcrest.MatcherAssert.assertThat
+import org.junit.Before
 import org.junit.Test
 
 class ControllerTest {
-
+    @Before
+    fun setUp(){
+        Config.default = Config(25)
+    }
+    
     @Test
     fun convertInputは文字列を数値のリストに変換する() {
         val testData = "0000120011333113332133222"

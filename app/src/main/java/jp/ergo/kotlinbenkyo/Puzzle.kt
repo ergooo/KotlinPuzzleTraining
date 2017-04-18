@@ -1,10 +1,5 @@
 package jp.ergo.kotlinbenkyo
 
-import jp.ergo.kotlinbenkyo.Config.bottomEdge
-import jp.ergo.kotlinbenkyo.Config.columnCount
-import jp.ergo.kotlinbenkyo.Config.rightEdge
-import jp.ergo.kotlinbenkyo.Config.size
-
 
 enum class Direction(val rawValue: Int) {
     RIGHT(0),
@@ -32,7 +27,7 @@ enum class Direction(val rawValue: Int) {
 data class Address(val x: Int, val y: Int) {
     fun right(): Address? {
         return when (x) {
-            rightEdge -> null
+            Config.default.rightEdge -> null
             else -> Address(x + 1, y)
         }
     }
@@ -46,7 +41,7 @@ data class Address(val x: Int, val y: Int) {
 
     fun down(): Address? {
         return when (y) {
-            bottomEdge -> null
+            Config.default.bottomEdge -> null
             else -> Address(x, y + 1)
         }
     }
@@ -59,7 +54,7 @@ data class Address(val x: Int, val y: Int) {
     }
 
     fun isBottomEdge(): Boolean {
-        return y == bottomEdge
+        return y == Config.default.bottomEdge
     }
 
     fun isLeftEdge(): Boolean {
@@ -67,37 +62,32 @@ data class Address(val x: Int, val y: Int) {
     }
 
     fun origin(): Int {
-        return y * columnCount + x
+        return y * Config.default.columnCount + x
     }
 
 }
 
-object Config {
-    private var s: Int = 25;
-
-    fun init(size: Int) {
-        this.s = size
+class Config(val size: Int) {
+    companion object {
+        var default = Config(25)
     }
 
     /**
      * 下端のyのindex。5x5なら4
      * 0 origin
      */
-    val bottomEdge: Int by lazy { Math.sqrt(s.toDouble()).toInt() - 1 }
+    val bottomEdge: Int by lazy { Math.sqrt(size.toDouble()).toInt() - 1 }
     /**
      * 右端のxのindex。5x5なら4
      * 0 origin
      */
-    val rightEdge: Int by lazy { Math.sqrt(s.toDouble()).toInt() - 1 }
+    val rightEdge: Int by lazy { Math.sqrt(size.toDouble()).toInt() - 1 }
 
     /**
      * 列の数。5x5なら5
      * 1 origin
      */
-    val columnCount: Int by lazy { Math.sqrt(s.toDouble()).toInt() }
-
-    val size: Int by lazy { s }
-
+    val columnCount: Int by lazy { Math.sqrt(size.toDouble()).toInt() }
 }
 
 
@@ -105,14 +95,14 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
 
     companion object {
         fun create5x5Field(rawDirections: List<Int>): Field? {
-            if (rawDirections.size != size) return null
+            if (rawDirections.size != Config.default.size) return null
             val directions = rawDirections.map { Direction.of(it) }
-            val addresses = IntRange(0, bottomEdge).map { x -> IntRange(0, rightEdge).map { y -> Address(x, y) } }.flatten()
+            val addresses = IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten()
             val masus = addresses.zip(directions, ::Pair).toMap()
             return Field(masus)
         }
 
-        val EMPTY = Field(IntRange(0, bottomEdge).map { x -> IntRange(0, rightEdge).map { y -> Address(x, y) } }.flatten().zip(IntRange(0, size - 1).map { null as Direction? }, ::Pair).toMap())
+        val EMPTY = Field(IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten().zip(IntRange(0, Config.default.size - 1).map { null as Direction? }, ::Pair).toMap())
     }
 
     /**
@@ -227,14 +217,14 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * ↓ ↓ ↓ ↓ ←
      */
     fun toArrowSquare(): String {
-        val address = IntRange(0, bottomEdge).map { x -> IntRange(0, rightEdge).map { y -> Address(x, y) } }.flatten()
-        val directions = IntRange(0, size - 1).map { null }
+        val address = IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten()
+        val directions = IntRange(0, Config.default.size - 1).map { null }
         val nullMasus: Map<Address, Direction?> = address.zip(directions, ::Pair).toMap()
         val sorted = (nullMasus + masus).toList().sortedWith(Comparator { left, right -> left.first.origin() - right.first.origin() })
         return sorted.fold("", { acc, pair ->
             val arrow = if (pair.second != null) pair.second!!.toArrow() else "-"
             when (pair.first.x) {
-                rightEdge -> acc + arrow + "\n"
+                Config.default.rightEdge -> acc + arrow + "\n"
                 else -> acc + arrow + " "
             }
         })

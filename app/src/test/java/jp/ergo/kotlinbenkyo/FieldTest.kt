@@ -3,7 +3,6 @@ package jp.ergo.kotlinbenkyo
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.IsNull
-import org.junit.Before
 import org.junit.Test
 
 class FieldTest {
@@ -196,11 +195,11 @@ class FieldTest {
         val sut = Field.createField(Controller.convertInput(testData))
         val actual = sut!!.collapseFrom(Address(0, 0)).toArrowSquare().trim()
         val expect = """
-↑ ↑ ↑ - -
-→ → ↑ ↑ ↑
-→ → ↑ ↑ ←
-→ ↓ ↓ ← ←
-↓ ↓ ↓ ↓ ←
+- - - - -
+← - - - -
+↑ - - - -
+↑ - - - -
+↑ - - - -
 """.trim()
         assertThat(actual, `is`(expect))
     }

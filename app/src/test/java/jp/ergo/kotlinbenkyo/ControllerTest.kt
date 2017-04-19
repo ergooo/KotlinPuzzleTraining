@@ -36,6 +36,42 @@ class ControllerTest {
     }
 
     @Test
+    fun getPahtは0030122111300110030103031のFieldを解く() {
+        val testInput = "0030122111300110030103031"
+        val testData = Field.createField(Controller.convertInput(testInput))!!
+        val actual = Controller.getPath(testData).map { it.origin() }
+        val expect = listOf(0, 3, 15, 16, 20)
+        assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun getPahtは2120132302300131130120002のFieldを解く() {
+        val testInput = "2120132302300131130120002"
+        val testData = Field.createField(Controller.convertInput(testInput))!!
+        val actual = Controller.getPath(testData).map { it.origin() }
+        val expect = listOf(3, 10, 12, 16, 21)
+        assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun getPahtは2121222113211132211332203のFieldを解く() {
+        val testInput = "2121222113211132211332203"
+        val testData = Field.createField(Controller.convertInput(testInput))!!
+        val actual = Controller.getPath(testData).map { it.origin() }
+        val expect = listOf(1,3, 7, 16, 21 )
+        assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun getPahtは0000131122321021223200003のFieldを解く() {
+        val testInput = "0000131122321021223200003"
+        val testData = Field.createField(Controller.convertInput(testInput))!!
+        val actual = Controller.getPath(testData).map { it.origin() }
+        val expect = listOf(6)
+        assertThat(actual, `is`(expect))
+    }
+
+    @Test
     fun convertInputは文字列を数値のリストに変換する() {
         val testData = "0000120011333113332133222"
         val actual = Controller.convertInput(testData)

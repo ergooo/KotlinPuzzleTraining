@@ -24,7 +24,7 @@ class Controller {
             val collapsedMapList: Map<Field, List<Address>> = collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value }.map { it.key to it.value } }.flatten().toMap()
 
             // collapsedMapListの中にEmptyなやつがいれば即終了
-            return collapsedMapList[Field.EMPTY] ?: getPath(collapsedMapList.filterKeys { !cache.contains(it) }, cache + collapsedMapList.keys)
+            return collapsedMapList[Field.empty()] ?: getPath(collapsedMapList.filterKeys { !cache.contains(it) }, cache + collapsedMapList.keys)
         }
 
         fun toCollapsedMapList(collapsedMap: Map<Field, List<Address>>): List<Map<Field, List<Address>>> {

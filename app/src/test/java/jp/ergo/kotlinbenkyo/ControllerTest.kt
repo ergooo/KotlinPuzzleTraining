@@ -10,11 +10,11 @@ class ControllerTest {
 
     @Test
     fun getPathは3x3のFieldを解く() {
-//        val testInput = "1200"
-//        val testData = Field.createField(Controller.convertInput(testInput))!!
-//        val actual = Controller.getPath(testData)
-//        val expect = listOf(Address(1, 0))
-//        assertThat(actual, `is`(expect))
+        val testInput = "1200"
+        val testData = Field.createField(Controller.convertInput(testInput))!!
+        val actual = Controller.getPath(testData)
+        val expect = listOf(Address(1, 0))
+        assertThat(actual, `is`(expect))
     }
 
     @Test

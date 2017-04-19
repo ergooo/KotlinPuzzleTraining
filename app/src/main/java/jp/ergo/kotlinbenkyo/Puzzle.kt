@@ -105,11 +105,10 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
             return Field(masus)
         }
 
-        val EMPTY: Field by lazy {
-            Field(IntRange(0, Config.default.bottomEdge)
+        fun empty(): Field {
+            return Field(IntRange(0, Config.default.bottomEdge)
                     .map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }
                     .flatten()
-                    .sortedWith(Comparator { left, right -> left.origin() - right.origin() })
                     .zip(IntRange(0, Config.default.size - 1).map { null as Direction? }, ::Pair)
                     .toMap())
         }

@@ -19,17 +19,16 @@ class Controller {
             return getPath(mapOf(field to listOf()))
         }
 
-        fun getPath(collapsedMap: Map<Field, List<Address>>): List<Address> {
+        tailrec fun getPath(collapsedMap: Map<Field, List<Address>>): List<Address> {
             // collapsedMapのField一つ一つにtoCollapsedMapを適用し、それまで辿ってきたAddressを追加する。得られる結果はListである。
-            val collapsedMapList: List<Map<Field, List<Address>>> = collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value } }
+            val collapsedMapList: Map<Field, List<Address>> = collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value } }.reduce { acc, map -> acc + map }
 
             // collapsedMapListの中にEmptyなやつがいれば即終了
-            val addressesWithEmptyField = collapsedMapList.filter { it[Field.EMPTY] != null }.firstOrNull()?.get(Field.EMPTY) ?: collapsedMap[Field.EMPTY]
-            if (addressesWithEmptyField != null) {
-                return addressesWithEmptyField
-            } else {
-                return collapsedMapList.map { getPath(it) }.first()
-            }
+            return collapsedMapList[Field.EMPTY] ?: getPath(collapsedMapList)
+        }
+
+        fun toCollapsedMapList(collapsedMap: Map<Field, List<Address>>): List<Map<Field, List<Address>>> {
+            return collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value } }
         }
 
         /**

@@ -10,11 +10,29 @@ class ControllerTest {
 
     @Test
     fun getPathは3x3のFieldを解く() {
-        val testInput = "1200"
+//        val testInput = "1200"
+//        val testData = Field.createField(Controller.convertInput(testInput))!!
+//        val actual = Controller.getPath(testData)
+//        val expect = listOf(Address(1, 0))
+//        assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun getPahtは0000120011333113332133222のFieldを解く() {
+        val testInput = "0000120011333113332133222"
         val testData = Field.createField(Controller.convertInput(testInput))!!
-        val actual = Controller.getPath(testData)
-        val expect = listOf(Address(1,0))
-        assertThat(actual, `is`(expect))        
+        val actual = Controller.getPath(testData).map { it.origin() }
+        val expect = listOf(0, 20)
+        assertThat(actual, `is`(expect))
+    }
+
+    @Test
+    fun getPahtは0003110131023201033102312のFieldを解く() {
+        val testInput = "0003110131023201033102312"
+        val testData = Field.createField(Controller.convertInput(testInput))!!
+        val actual = Controller.getPath(testData).map { it.origin() }
+        val expect = listOf(4, 6, 15, 16, 20, 16)
+        assertThat(actual, `is`(expect))
     }
 
     @Test

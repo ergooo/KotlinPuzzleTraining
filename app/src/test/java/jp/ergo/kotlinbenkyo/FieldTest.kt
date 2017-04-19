@@ -234,13 +234,13 @@ class FieldTest {
 
     @Test
     fun EMPTYはすべてのDirectionがnullである() {
-        val sut = Field.EMPTY
+        val sut = Field.empty()
         sut.masus.values.forEach { assertThat(it, `is`(nullValue())) }
     }
 
     @Test
     fun EMPTYはすべてのDirectionがnullな別インスタンスとイコールで比較した時tureを返す() {
-        val sut = Field.EMPTY
+        val sut = Field.empty()
 
         val expect = Field((0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten().zip((0..24).map { null as Direction? }, ::Pair).toMap())
         assertThat(sut, `is`(equalTo(expect)))

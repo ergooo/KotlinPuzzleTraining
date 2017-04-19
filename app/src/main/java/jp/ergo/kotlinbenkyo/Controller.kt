@@ -21,14 +21,10 @@ class Controller {
 
         tailrec fun getPath(collapsedMap: Map<Field, List<Address>>, cache: Set<Field>): List<Address> {
             // collapsedMapのField一つ一つにtoCollapsedMapを適用し、それまで辿ってきたAddressを追加する。得られる結果はListである。
-            val collapsedMapList: Map<Field, List<Address>> = collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value }.map { it.key to it.value } }.flatten().toMap()
+            val collapsedMapList = collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value }.map { it.key to it.value } }.flatten().toMap()
 
             // collapsedMapListの中にEmptyなやつがいれば即終了
             return collapsedMapList[Field.empty()] ?: getPath(collapsedMapList.filterKeys { !cache.contains(it) }, cache + collapsedMapList.keys)
-        }
-
-        fun toCollapsedMapList(collapsedMap: Map<Field, List<Address>>): List<Map<Field, List<Address>>> {
-            return collapsedMap.map { toCollapsedMap(it.key).mapValues { entry -> it.value + entry.value } }
         }
 
         /**

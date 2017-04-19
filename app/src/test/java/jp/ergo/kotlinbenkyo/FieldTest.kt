@@ -6,10 +6,16 @@ import org.hamcrest.core.IsNull
 import org.junit.Test
 
 class FieldTest {
+    @Test(expected = IllegalArgumentException::class)
+    fun createFieldは5x4のサイズの引数を受け取ると例外を投げる() {
+        val testData = "00000000000000000000"
+        Field.createField(Controller.convertInput(testData))
+    }
+
     @Test
     fun collapseFromTest() {
         val testData = "0000120011333113332133222"
-        val sut = Field.create5x5Field(Controller.convertInput(testData))
+        val sut = Field.createField(Controller.convertInput(testData))
         val actual = sut!!.collapseFrom(Address(0, 0))
 
         assertThat(actual.masus[Address(3, 0)], IsNull())
@@ -20,7 +26,7 @@ class FieldTest {
     fun create5x5FieldTest() {
         val testData = (0..24).map { 1 }
         assertThat(testData.size, `is`(25))
-        val actual = Field.create5x5Field(testData)
+        val actual = Field.createField(testData)
         val expect = Field(mapOf(
                 Address(0, 0) to Direction.DOWN,
                 Address(0, 1) to Direction.DOWN,
@@ -186,14 +192,14 @@ class FieldTest {
     @Test
     fun toArrowSquareTest() {
         val testData = "0000120011333113332133222"
-        val sut = Field.create5x5Field(Controller.convertInput(testData))
+        val sut = Field.createField(Controller.convertInput(testData))
         val actual = sut!!.collapseFrom(Address(0, 0)).toArrowSquare().trim()
         val expect = """
-↑ ↑ ↑ - -
-→ → ↑ ↑ ↑
-→ → ↑ ↑ ←
-→ ↓ ↓ ← ←
-↓ ↓ ↓ ↓ ←
+- - - - -
+← - - - -
+↑ - - - -
+↑ - - - -
+↑ - - - -
 """.trim()
         assertThat(actual, `is`(expect))
     }
@@ -228,13 +234,13 @@ class FieldTest {
 
     @Test
     fun EMPTYはすべてのDirectionがnullである() {
-        val sut = Field.EMPTY
+        val sut = Field.empty()
         sut.masus.values.forEach { assertThat(it, `is`(nullValue())) }
     }
 
     @Test
     fun EMPTYはすべてのDirectionがnullな別インスタンスとイコールで比較した時tureを返す() {
-        val sut = Field.EMPTY
+        val sut = Field.empty()
 
         val expect = Field((0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten().zip((0..24).map { null as Direction? }, ::Pair).toMap())
         assertThat(sut, `is`(equalTo(expect)))

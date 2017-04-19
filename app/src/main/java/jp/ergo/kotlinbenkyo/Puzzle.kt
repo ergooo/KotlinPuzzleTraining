@@ -27,7 +27,7 @@ enum class Direction(val rawValue: Int) {
 data class Address(val x: Int, val y: Int) {
     fun right(): Address? {
         return when (x) {
-            4 -> null
+            Config.default.rightEdge -> null
             else -> Address(x + 1, y)
         }
     }
@@ -41,7 +41,7 @@ data class Address(val x: Int, val y: Int) {
 
     fun down(): Address? {
         return when (y) {
-            4 -> null
+            Config.default.bottomEdge -> null
             else -> Address(x, y + 1)
         }
     }
@@ -53,32 +53,64 @@ data class Address(val x: Int, val y: Int) {
         }
     }
 
-    fun isBottomEdge(): Boolean {
-        return y == 4
-    }
-
-    fun isLeftEdge(): Boolean {
-        return x == 0
-    }
-
     fun origin(): Int {
-        return y * 5 + x
+        return y * Config.default.columnCount + x
     }
 
 }
 
+class Config(val size: Int) {
+    companion object {
+        var default = Config(25)
+    }
+
+    /**
+     * 下端のyのindex。5x5なら4
+     * 0 origin
+     */
+    val bottomEdge: Int by lazy { Math.sqrt(size.toDouble()).toInt() - 1 }
+    /**
+     * 右端のxのindex。5x5なら4
+     * 0 origin
+     */
+    val rightEdge: Int by lazy { Math.sqrt(size.toDouble()).toInt() - 1 }
+
+    /**
+     * 列の数。5x5なら5
+     * 1 origin
+     */
+    val columnCount: Int by lazy { Math.sqrt(size.toDouble()).toInt() }
+}
+
+
 class Field internal constructor(val masus: Map<Address, Direction?>) {
 
     companion object {
-        fun create5x5Field(rawDirections: List<Int>): Field? {
-            if (rawDirections.size != 25) return null
-            val directions = rawDirections.map { Direction.of(it) }
-            val addresses = (0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten()
-            val masus = addresses.zip(directions, ::Pair).toMap()
-            return Field(masus)
+        fun createField(rawDirections: List<Int>): Field? {
+            validate(rawDirections.size)
+            Config.default = Config(rawDirections.size)
+
+            return Field(
+                    IntRange(0, Config.default.bottomEdge)
+                            .map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }
+                            .flatten()
+                            .sortedWith(Comparator { left, right -> left.origin() - right.origin() })
+                            .zip(rawDirections.map { Direction.of(it) }, ::Pair).toMap()
+            )
         }
 
-        val EMPTY = Field((0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten().zip((0..24).map { null as Direction? }, ::Pair).toMap())
+        fun empty(): Field {
+            return Field(IntRange(0, Config.default.bottomEdge)
+                    .map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }
+                    .flatten()
+                    .zip(IntRange(0, Config.default.size - 1).map { null as Direction? }, ::Pair)
+                    .toMap())
+        }
+
+        fun validate(size: Int) {
+            val sqrt = Math.sqrt(size.toDouble()).toInt()
+            if (size / sqrt != sqrt) throw IllegalArgumentException("リストのサイズは5x5など整数の平方根を取れなければなりません。size: " + size)
+        }
     }
 
     /**
@@ -111,13 +143,12 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
         val filtered = masus.filter { canMove(masus, it.key) }
         return when {
             filtered.isEmpty() -> Field(masus)
-            else -> {
-                // 変更があった要素のMap
-                val changedMap = filtered.map { slide(it.key, it.value) }.flatten().toMap()
-                // 変更のなかった要素とマージ
-                val merged = masus.filterNot { changedMap.contains(it.key) } + changedMap
-                moveField(merged, canMove, slide)
-            }
+            else -> moveField(
+                    filtered.map { slide(it.key, it.value) }.flatten().toMap()  // 変更があった要素のMap
+                            .let { masus.filterNot { e -> it.contains(e.key) } + it }   // 変更がなかったものとマージ
+                    , canMove
+                    , slide)
+
         }
     }
 
@@ -134,7 +165,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     private val canDown: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
-        masus[address] != null && masus[address.down()] == null && !address.isBottomEdge()
+        masus[address] != null && masus[address.down()] == null && !isBottomEdge(address)
     }
 
     /**
@@ -149,7 +180,16 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     private val canLeft: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
-        masus[address] != null && masus[address.left()] == null && !address.isLeftEdge()
+        masus[address] != null && masus[address.left()] == null && !isLeftEdge(address)
+    }
+
+
+    fun isBottomEdge(address: Address): Boolean {
+        return address.y == Config.default.bottomEdge
+    }
+
+    fun isLeftEdge(address: Address): Boolean {
+        return address.x == 0
     }
 
     /**
@@ -193,14 +233,14 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * ↓ ↓ ↓ ↓ ←
      */
     fun toArrowSquare(): String {
-        val address = (0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten()
-        val directions = (0..24).map { null }
+        val address = IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten()
+        val directions = IntRange(0, Config.default.size - 1).map { null }
         val nullMasus: Map<Address, Direction?> = address.zip(directions, ::Pair).toMap()
         val sorted = (nullMasus + masus).toList().sortedWith(Comparator { left, right -> left.first.origin() - right.first.origin() })
         return sorted.fold("", { acc, pair ->
             val arrow = if (pair.second != null) pair.second!!.toArrow() else "-"
             when (pair.first.x) {
-                4 -> acc + arrow + "\n"
+                Config.default.rightEdge -> acc + arrow + "\n"
                 else -> acc + arrow + " "
             }
         })

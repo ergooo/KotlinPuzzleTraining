@@ -53,14 +53,6 @@ data class Address(val x: Int, val y: Int) {
         }
     }
 
-    fun isBottomEdge(): Boolean {
-        return y == Config.default.bottomEdge
-    }
-
-    fun isLeftEdge(): Boolean {
-        return x == 0
-    }
-
     fun origin(): Int {
         return y * Config.default.columnCount + x
     }
@@ -95,14 +87,16 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
 
     companion object {
         fun createField(rawDirections: List<Int>): Field? {
-            val sqrt = Math.sqrt(rawDirections.size.toDouble()).toInt()
-            if (rawDirections.size / sqrt != sqrt) throw IllegalArgumentException("リストのサイズは5x5など整数の平方根を取れなければなりません。size: " + rawDirections.size)
+            validate(rawDirections.size)
             Config.default = Config(rawDirections.size)
-            if (rawDirections.size != Config.default.size) return null
-            val directions = rawDirections.map { Direction.of(it) }
-            val addresses = IntRange(0, Config.default.bottomEdge).map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }.flatten().sortedWith(Comparator { left, right -> left.origin() - right.origin() })
-            val masus = addresses.zip(directions, ::Pair).toMap()
-            return Field(masus)
+
+            return Field(
+                    IntRange(0, Config.default.bottomEdge)
+                            .map { x -> IntRange(0, Config.default.rightEdge).map { y -> Address(x, y) } }
+                            .flatten()
+                            .sortedWith(Comparator { left, right -> left.origin() - right.origin() })
+                            .zip(rawDirections.map { Direction.of(it) }, ::Pair).toMap()
+            )
         }
 
         fun empty(): Field {
@@ -111,6 +105,11 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
                     .flatten()
                     .zip(IntRange(0, Config.default.size - 1).map { null as Direction? }, ::Pair)
                     .toMap())
+        }
+
+        fun validate(size: Int) {
+            val sqrt = Math.sqrt(size.toDouble()).toInt()
+            if (size / sqrt != sqrt) throw IllegalArgumentException("リストのサイズは5x5など整数の平方根を取れなければなりません。size: " + size)
         }
     }
 
@@ -144,13 +143,12 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
         val filtered = masus.filter { canMove(masus, it.key) }
         return when {
             filtered.isEmpty() -> Field(masus)
-            else -> {
-                // 変更があった要素のMap
-                val changedMap = filtered.map { slide(it.key, it.value) }.flatten().toMap()
-                // 変更のなかった要素とマージ
-                val merged = masus.filterNot { changedMap.contains(it.key) } + changedMap
-                moveField(merged, canMove, slide)
-            }
+            else -> moveField(
+                    filtered.map { slide(it.key, it.value) }.flatten().toMap()  // 変更があった要素のMap
+                            .let { masus.filterNot { e -> it.contains(e.key) } + it }   // 変更がなかったものとマージ
+                    , canMove
+                    , slide)
+
         }
     }
 
@@ -167,7 +165,7 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     private val canDown: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
-        masus[address] != null && masus[address.down()] == null && !address.isBottomEdge()
+        masus[address] != null && masus[address.down()] == null && !isBottomEdge(address)
     }
 
     /**
@@ -182,7 +180,16 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     private val canLeft: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
-        masus[address] != null && masus[address.left()] == null && !address.isLeftEdge()
+        masus[address] != null && masus[address.left()] == null && !isLeftEdge(address)
+    }
+
+
+    fun isBottomEdge(address: Address): Boolean {
+        return address.y == Config.default.bottomEdge
+    }
+
+    fun isLeftEdge(address: Address): Boolean {
+        return address.x == 0
     }
 
     /**

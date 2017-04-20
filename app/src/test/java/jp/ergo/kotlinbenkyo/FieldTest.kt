@@ -277,4 +277,33 @@ class AddressTest {
         assertThat(Address(3, 4).origin(), `is`(23))
         assertThat(Address(4, 4).origin(), `is`(24))
     }
+
+    @Test
+    fun ofにoriginを渡すとAddressができる() {
+        assertThat(Address.of(0), `is`(Address(0,0)))
+        assertThat(Address.of(1), `is`(Address(1,0)))
+        assertThat(Address.of(2), `is`(Address(2,0)))
+        assertThat(Address.of(3), `is`(Address(3,0)))
+        assertThat(Address.of(4), `is`(Address(4,0)))
+        assertThat(Address.of(5), `is`(Address(0,1)))
+        assertThat(Address.of(6), `is`(Address(1,1)))
+        assertThat(Address.of(7), `is`(Address(2,1)))
+        assertThat(Address.of(8), `is`(Address(3,1)))
+        assertThat(Address.of(9), `is`(Address(4,1)))
+        assertThat(Address.of(10), `is`(Address(0,2)))
+        assertThat(Address.of(11), `is`(Address(1,2)))
+        assertThat(Address.of(12), `is`(Address(2,2)))
+        assertThat(Address.of(13), `is`(Address(3,2)))
+        assertThat(Address.of(14), `is`(Address(4,2)))
+        assertThat(Address.of(15), `is`(Address(0,3)))
+        assertThat(Address.of(16), `is`(Address(1,3)))
+        assertThat(Address.of(17), `is`(Address(2,3)))
+        assertThat(Address.of(18), `is`(Address(3,3)))
+        assertThat(Address.of(19), `is`(Address(4,3)))
+        assertThat(Address.of(20), `is`(Address(0,4)))
+        assertThat(Address.of(21), `is`(Address(1,4)))
+        assertThat(Address.of(22), `is`(Address(2,4)))
+        assertThat(Address.of(23), `is`(Address(3,4)))
+        assertThat(Address.of(24), `is`(Address(4,4)))
+    }
 }

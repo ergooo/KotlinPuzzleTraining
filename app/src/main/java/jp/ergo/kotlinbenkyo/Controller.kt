@@ -4,11 +4,18 @@ import jp.ergo.kotlinbenkyo.Controller.Companion.getPath
 
 
 fun main(args: Array<String>) {
-    val input = "0000120011333113332133222"
+    Logger.enabled = true
+    val input = "0003110131023201033102312"
     val field = Field.createField(Controller.convertInput(input))!!
-
-    val path = getPath(field)
-    println(path)
+    println(field.toArrowSquare())
+    
+    val actual = field
+            .collapseFrom(Address.of(16))
+            .collapseFrom(Address.of(16))
+            .collapseFrom(Address.of(15))
+            .collapseFrom(Address.of(20))
+            .collapseFrom(Address.of(11))
+            .collapseFrom(Address.of(6))
 }
 
 

@@ -57,6 +57,19 @@ data class Address(val x: Int, val y: Int) {
         return y * Config.default.columnCount + x
     }
 
+    override fun toString(): String {
+        return "Address(x=$x, y=$y, origin=${origin()})"
+    }
+
+    companion object {
+        fun of(origin: Int): Address {
+            val x = origin % Config.default.columnCount
+            val y = (origin / Config.default.columnCount)
+            return Address(x, y)
+
+        }
+    }
+
 }
 
 class Config(val size: Int) {
@@ -131,6 +144,8 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      */
     fun removedField(address: List<Address>): Field {
         val removedMasus = masus.map { Pair(it.key, if (address.contains(it.key)) null else it.value) }.toMap()
+        Logger.d("remove from ${address.first()}")
+        Logger.d(Field(removedMasus).toArrowSquare())
         return Field(removedMasus)
     }
 
@@ -156,7 +171,10 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return Directionがnullである要素を下詰にしたFieldを返す
      */
     fun moveDownField(): Field {
-        return moveField(masus, canDown, slideDown)
+        val field = moveField(masus, canDown, slideDown)
+        Logger.d("move down")
+        Logger.d(field.toArrowSquare())
+        return field
     }
 
 
@@ -172,7 +190,10 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return Directionがnullである要素を左詰めにしたFieldを返す。
      */
     fun moveLeftField(): Field {
-        return moveField(masus, canLeft, slideLeft)
+        val field = moveField(masus, canLeft, slideLeft)
+        Logger.d("move left")
+        Logger.d(field.toArrowSquare())
+        return field
     }
 
     private val slideLeft: (Address, Direction?) -> List<Pair<Address, Direction?>> = { address: Address, direction: Direction? ->
@@ -180,7 +201,18 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
     }
 
     private val canLeft: (Map<Address, Direction?>, Address) -> Boolean = { masus: Map<Address, Direction?>, address: Address ->
-        masus[address] != null && masus[address.left()] == null && !isLeftEdge(address)
+        // 対象のAddressのDirectionがnullではない
+        // 左端ではない
+        // 対象のAddressの左側の一列が全部nullである
+        masus[address] != null
+                && !isLeftEdge(address)
+                && isLeftRowEmpty(masus, address)
+    }
+
+    private fun isLeftRowEmpty(masus: Map<Address, Direction?>, address: Address): Boolean {
+        return address.left()?.let {
+            masus.filter { e -> e.key.x == it.x && e.value != null }.isEmpty()
+        } ?: false
     }
 
 

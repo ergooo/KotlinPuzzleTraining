@@ -31,7 +31,7 @@ class ControllerTest {
         val testInput = "0003110131023201033102312"
         val testData = Field.createField(Controller.convertInput(testInput))!!
         val actual = Controller.getPath(testData).map { it.origin() }
-        val expect = listOf(4, 6, 15, 16, 20, 16)
+        val expect = listOf(16, 16, 15, 20, 11, 6)
         assertThat(actual, `is`(expect))
     }
 
@@ -40,7 +40,7 @@ class ControllerTest {
         val testInput = "0030122111300110030103031"
         val testData = Field.createField(Controller.convertInput(testInput))!!
         val actual = Controller.getPath(testData).map { it.origin() }
-        val expect = listOf(0, 3, 15, 16, 20)
+        val expect = listOf(20, 16, 13, 15, 20)
         assertThat(actual, `is`(expect))
     }
 
@@ -49,7 +49,7 @@ class ControllerTest {
         val testInput = "2120132302300131130120002"
         val testData = Field.createField(Controller.convertInput(testInput))!!
         val actual = Controller.getPath(testData).map { it.origin() }
-        val expect = listOf(3, 10, 12, 16, 21)
+        val expect = listOf(19, 11, 17, 15, 15)
         assertThat(actual, `is`(expect))
     }
 
@@ -58,7 +58,7 @@ class ControllerTest {
         val testInput = "2121222113211132211332203"
         val testData = Field.createField(Controller.convertInput(testInput))!!
         val actual = Controller.getPath(testData).map { it.origin() }
-        val expect = listOf(1,3, 7, 16, 21 )
+        val expect = listOf(2, 21, 16, 23, 6)
         assertThat(actual, `is`(expect))
     }
 
@@ -103,7 +103,7 @@ class ControllerTest {
         assertThat(actual.filter { it.value == Address(1, 0) }.keys.first().toArrowSquare().trim(), `is`(actual00))
 
         val actual01 = """
-→ → → ↓ -
+- → → → ↓
 → → → ↓ ↓
 ↑ ↑ ↑ ↓ ↓
 ↑ ↑ ↑ ← ↓

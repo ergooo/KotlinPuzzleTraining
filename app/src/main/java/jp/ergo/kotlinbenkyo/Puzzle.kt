@@ -143,10 +143,11 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return 指定したアドレスリストのDirectionをnullにしたFieldを返す。
      */
     fun removedField(address: List<Address>): Field {
-        val removedMasus = masus.map { Pair(it.key, if (address.contains(it.key)) null else it.value) }.toMap()
-        Logger.d("remove from ${address.first()}")
-        Logger.d(Field(removedMasus).toArrowSquare())
-        return Field(removedMasus)
+        return masus.mapValues { if (address.contains(it.key)) null else it.value }.let {
+            Logger.d("remove from ${address.first()}")
+            Logger.d(Field(it).toArrowSquare())
+            Field(it)
+        }
     }
 
     /**
@@ -163,7 +164,6 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
                             .let { masus.filterNot { e -> it.contains(e.key) } + it }   // 変更がなかったものとマージ
                     , canMove
                     , slide)
-
         }
     }
 
@@ -171,10 +171,11 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return Directionがnullである要素を下詰にしたFieldを返す
      */
     fun moveDownField(): Field {
-        val field = moveField(masus, canDown, slideDown)
-        Logger.d("move down")
-        Logger.d(field.toArrowSquare())
-        return field
+        return moveField(masus, canDown, slideDown).let {
+            Logger.d("move down")
+            Logger.d(it.toArrowSquare())
+            it
+        }
     }
 
 
@@ -190,10 +191,11 @@ class Field internal constructor(val masus: Map<Address, Direction?>) {
      * @return Directionがnullである要素を左詰めにしたFieldを返す。
      */
     fun moveLeftField(): Field {
-        val field = moveField(masus, canLeft, slideLeft)
-        Logger.d("move left")
-        Logger.d(field.toArrowSquare())
-        return field
+        return moveField(masus, canLeft, slideLeft).let {
+            Logger.d("move left")
+            Logger.d(it.toArrowSquare())
+            it
+        }
     }
 
     private val slideLeft: (Address, Direction?) -> List<Pair<Address, Direction?>> = { address: Address, direction: Direction? ->

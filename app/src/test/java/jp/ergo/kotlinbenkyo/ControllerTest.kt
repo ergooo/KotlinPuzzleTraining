@@ -13,7 +13,7 @@ class ControllerTest {
         val testInput = "1200"
         val testData = Field.createField(Controller.convertInput(testInput))!!
         val actual = Controller.getPath(testData)
-        val expect = listOf(Address(1, 0))
+        val expect = listOf(Address(1, 0, Config(4)))
         assertThat(actual, `is`(expect))
     }
 
@@ -100,7 +100,7 @@ class ControllerTest {
 ↑ - - - -
 ↑ - - - -
         """.trim()
-        assertThat(actual.filter { it.value == Address(1, 0) }.keys.first().toArrowSquare().trim(), `is`(actual00))
+        assertThat(actual.filter { it.value == Address(1, 0, Config(25)) }.keys.first().toArrowSquare().trim(), `is`(actual00))
 
         val actual01 = """
 - → → → ↓
@@ -109,6 +109,6 @@ class ControllerTest {
 ↑ ↑ ↑ ← ↓
 ↑ ↑ ← ← ←
 """.trim()
-        assertThat(actual.filter { it.value == Address(0, 1) }.keys.first().toArrowSquare().trim(), `is`(actual01))
+        assertThat(actual.filter { it.value == Address(0, 1, Config(25)) }.keys.first().toArrowSquare().trim(), `is`(actual01))
     }
 }

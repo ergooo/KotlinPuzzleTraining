@@ -135,7 +135,7 @@ class FieldTest {
                 Address(0, 3) to Direction.DOWN,
                 Address(0, 4) to null
         )
-        val sut = Field(testData)
+        val sut = Field(testData, Config(25))
         val actual = sut.moveDownField()
 
         val expect = Field(mapOf(
@@ -157,7 +157,7 @@ class FieldTest {
                 Address(3, 0) to Direction.DOWN,
                 Address(4, 0) to Direction.DOWN
         )
-        val sut = Field(testData)
+        val sut = Field(testData, Config(25))
         val actual = sut.moveLeftField()
 
         val expect = Field(mapOf(
@@ -234,15 +234,28 @@ class FieldTest {
 
     @Test
     fun EMPTYはすべてのDirectionがnullである() {
-        val sut = Field.empty()
+        val testData = mapOf(
+                Address(0, 0) to Direction.DOWN,
+                Address(1, 0) to Direction.DOWN,
+                Address(2, 0) to Direction.DOWN,
+                Address(3, 0) to Direction.DOWN,
+                Address(0, 4) to null
+        )
+        val sut = Field(testData).empty()
         sut.masus.values.forEach { assertThat(it, `is`(nullValue())) }
     }
 
     @Test
     fun EMPTYはすべてのDirectionがnullな別インスタンスとイコールで比較した時tureを返す() {
-        val sut = Field.empty()
-
-        val expect = Field((0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten().zip((0..24).map { null as Direction? }, ::Pair).toMap())
+        val testData = mapOf(
+                Address(0, 0) to Direction.DOWN,
+                Address(1, 0) to Direction.DOWN,
+                Address(2, 0) to Direction.DOWN,
+                Address(3, 0) to Direction.DOWN,
+                Address(0, 4) to null
+        )
+        val sut = Field(testData, Config(5)).empty()
+        val expect = Field(testData.mapValues { null }, Config(5)).empty()
         assertThat(sut, `is`(equalTo(expect)))
 
     }
@@ -280,30 +293,30 @@ class AddressTest {
 
     @Test
     fun ofにoriginを渡すとAddressができる() {
-        assertThat(Address.of(0), `is`(Address(0,0)))
-        assertThat(Address.of(1), `is`(Address(1,0)))
-        assertThat(Address.of(2), `is`(Address(2,0)))
-        assertThat(Address.of(3), `is`(Address(3,0)))
-        assertThat(Address.of(4), `is`(Address(4,0)))
-        assertThat(Address.of(5), `is`(Address(0,1)))
-        assertThat(Address.of(6), `is`(Address(1,1)))
-        assertThat(Address.of(7), `is`(Address(2,1)))
-        assertThat(Address.of(8), `is`(Address(3,1)))
-        assertThat(Address.of(9), `is`(Address(4,1)))
-        assertThat(Address.of(10), `is`(Address(0,2)))
-        assertThat(Address.of(11), `is`(Address(1,2)))
-        assertThat(Address.of(12), `is`(Address(2,2)))
-        assertThat(Address.of(13), `is`(Address(3,2)))
-        assertThat(Address.of(14), `is`(Address(4,2)))
-        assertThat(Address.of(15), `is`(Address(0,3)))
-        assertThat(Address.of(16), `is`(Address(1,3)))
-        assertThat(Address.of(17), `is`(Address(2,3)))
-        assertThat(Address.of(18), `is`(Address(3,3)))
-        assertThat(Address.of(19), `is`(Address(4,3)))
-        assertThat(Address.of(20), `is`(Address(0,4)))
-        assertThat(Address.of(21), `is`(Address(1,4)))
-        assertThat(Address.of(22), `is`(Address(2,4)))
-        assertThat(Address.of(23), `is`(Address(3,4)))
-        assertThat(Address.of(24), `is`(Address(4,4)))
+        assertThat(Address.of(0), `is`(Address(0, 0)))
+        assertThat(Address.of(1), `is`(Address(1, 0)))
+        assertThat(Address.of(2), `is`(Address(2, 0)))
+        assertThat(Address.of(3), `is`(Address(3, 0)))
+        assertThat(Address.of(4), `is`(Address(4, 0)))
+        assertThat(Address.of(5), `is`(Address(0, 1)))
+        assertThat(Address.of(6), `is`(Address(1, 1)))
+        assertThat(Address.of(7), `is`(Address(2, 1)))
+        assertThat(Address.of(8), `is`(Address(3, 1)))
+        assertThat(Address.of(9), `is`(Address(4, 1)))
+        assertThat(Address.of(10), `is`(Address(0, 2)))
+        assertThat(Address.of(11), `is`(Address(1, 2)))
+        assertThat(Address.of(12), `is`(Address(2, 2)))
+        assertThat(Address.of(13), `is`(Address(3, 2)))
+        assertThat(Address.of(14), `is`(Address(4, 2)))
+        assertThat(Address.of(15), `is`(Address(0, 3)))
+        assertThat(Address.of(16), `is`(Address(1, 3)))
+        assertThat(Address.of(17), `is`(Address(2, 3)))
+        assertThat(Address.of(18), `is`(Address(3, 3)))
+        assertThat(Address.of(19), `is`(Address(4, 3)))
+        assertThat(Address.of(20), `is`(Address(0, 4)))
+        assertThat(Address.of(21), `is`(Address(1, 4)))
+        assertThat(Address.of(22), `is`(Address(2, 4)))
+        assertThat(Address.of(23), `is`(Address(3, 4)))
+        assertThat(Address.of(24), `is`(Address(4, 4)))
     }
 }

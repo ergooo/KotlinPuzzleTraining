@@ -135,7 +135,7 @@ class FieldTest {
                 Address(0, 3) to Direction.DOWN,
                 Address(0, 4) to null
         )
-        val sut = Field(testData)
+        val sut = Field(testData, Config(25))
         val actual = sut.moveDownField()
 
         val expect = Field(mapOf(
@@ -157,7 +157,7 @@ class FieldTest {
                 Address(3, 0) to Direction.DOWN,
                 Address(4, 0) to Direction.DOWN
         )
-        val sut = Field(testData)
+        val sut = Field(testData, Config(25))
         val actual = sut.moveLeftField()
 
         val expect = Field(mapOf(
@@ -234,15 +234,29 @@ class FieldTest {
 
     @Test
     fun EMPTYはすべてのDirectionがnullである() {
-        val sut = Field.empty()
+        val testData = mapOf(
+                Address(0, 0) to Direction.DOWN,
+                Address(1, 0) to Direction.DOWN,
+                Address(2, 0) to Direction.DOWN,
+                Address(3, 0) to Direction.DOWN,
+                Address(0, 4) to null
+        )
+        val sut = Field(testData).empty()
         sut.masus.values.forEach { assertThat(it, `is`(nullValue())) }
     }
 
     @Test
     fun EMPTYはすべてのDirectionがnullな別インスタンスとイコールで比較した時tureを返す() {
-        val sut = Field.empty()
-
-        val expect = Field((0..4).map { x -> (0..4).map { y -> Address(x, y) } }.flatten().zip((0..24).map { null as Direction? }, ::Pair).toMap())
+        val testData = mapOf(
+                Address(0, 0) to Direction.DOWN,
+                Address(1, 0) to Direction.DOWN,
+                Address(2, 0) to Direction.DOWN,
+                Address(3, 0) to Direction.DOWN,
+                Address(0, 4) to null
+        )
+        val sut = Field(testData,Config(5)).empty()
+        
+        val expect = Field(testData.mapValues { null }, Config(5))
         assertThat(sut, `is`(equalTo(expect)))
 
     }

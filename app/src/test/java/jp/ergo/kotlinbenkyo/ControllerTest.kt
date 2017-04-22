@@ -83,7 +83,7 @@ class ControllerTest {
     fun toCollapsedMap() {
         val testInput = "0000120011333113332133222"
         val testData = Field.createField(Controller.convertInput(testInput))!!
-        val actual = Controller.toCollapsedMap(testData)
+        val actual = Controller.toCollapsedMap(testData, listOf())
         val testDataSquare = """
 → → → → ↓
 ← → → ↓ ↓
@@ -100,7 +100,7 @@ class ControllerTest {
 ↑ - - - -
 ↑ - - - -
         """.trim()
-        assertThat(actual.filter { it.value == Address(1, 0, Config(25)) }.keys.first().toArrowSquare().trim(), `is`(actual00))
+        assertThat(actual.filter { it.value == listOf(Address(1, 0, Config(25))) }.keys.first().toArrowSquare().trim(), `is`(actual00))
 
         val actual01 = """
 - → → → ↓
@@ -109,6 +109,6 @@ class ControllerTest {
 ↑ ↑ ↑ ← ↓
 ↑ ↑ ← ← ←
 """.trim()
-        assertThat(actual.filter { it.value == Address(0, 1, Config(25)) }.keys.first().toArrowSquare().trim(), `is`(actual01))
+        assertThat(actual.filter { it.value == listOf(Address(0, 1, Config(25))) }.keys.first().toArrowSquare().trim(), `is`(actual01))
     }
 }

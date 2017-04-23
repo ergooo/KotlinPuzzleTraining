@@ -1,16 +1,27 @@
 package jp.ergo.kotlinbenkyo
 
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.experimental.CommonPool
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+import java.lang.Thread.sleep
 
 
 fun main(args: Array<String>) {
 //    Logger.enabled = true
 //    test()
 
-    bench()
+    var finish = true
+    launch(CommonPool) {
+        bench()
+        finish = false
+    }
+    while (finish) {
+        sleep(100)
+    }
 }
 
-fun test(){
+fun test() {
     val input = "0003110131023201033102312"
     val field = Field.createField(Controller.convertInput(input))!!
     println(field.toArrowSquare())
@@ -24,20 +35,20 @@ fun test(){
             .collapseFrom(Address.of(6))
 }
 
-fun bench(){
+suspend fun bench() {
     val input = "0003110131023201033102312"
     val field = Field.createField(Controller.convertInput(input))!!
 
     var total = 0L
-    for(i in (0..10)){
+    for (i in (0..10)) {
         val start = System.currentTimeMillis()
         Controller.getPath(field)
         val end = System.currentTimeMillis()
         val diff = end - start
         total += diff
-        println(""+(diff.toDouble()/1000) + " sec")
+        println("" + (diff.toDouble() / 1000) + " sec")
     }
-    println("平均 "+(total.toDouble()/1000 / 10) + " sec")
+    println("平均 " + (total.toDouble() / 1000 / 10) + " sec")
 
 
 }
@@ -45,19 +56,44 @@ fun bench(){
 class Controller {
     companion object {
 
-        fun getPath(field: Field): List<Address> {
+        suspend fun getPath(field: Field): List<Address> {
             return getPath(mapOf(field to listOf()), hashSetOf())
         }
 
-        tailrec fun getPath(collapsedMap: Map<Field, List<Address>>, cache: Set<Field>): List<Address> {
+        suspend fun getPath(collapsedMap: Map<Field, List<Address>>, cache: Set<Field>): List<Address> {
+
             // collapsedMapのField一つ一つにtoCollapsedMapを適用し、それまで辿ってきたAddressを追加する。
-            val appliedCollapsedMap =
-                    collapsedMap
-                            .map { toCollapsedMap(it.key, it.value) }
-                            .flatten()
-                            .toMap()
+//            val appliedCollapsedMap = collapseSync(collapsedMap, cache)
+            val appliedCollapsedMap: Map<Field, List<Address>> = getPathAsync(collapsedMap, cache)
             // collapsedMapListの中にEmptyなやつがいれば即終了
             return appliedCollapsedMap[collapsedMap.keys.first().empty()] ?: getPath(appliedCollapsedMap.filterKeys { !cache.contains(it) }, cache + appliedCollapsedMap.keys)
+        }
+
+        suspend fun getPathAsync(collapsedMap: Map<Field, List<Address>>, cache: Set<Field>): Map<Field, List<Address>> {
+            if (collapsedMap.size == 1) {
+                return collapsedMap
+                        .map { toCollapsedMap(it.key, it.value) }
+                        .flatten()
+                        .toMap()
+            }
+
+            val evenRes = collapseAsync(collapsedMap.filterValues { it.first().hashCode() % 2 == 0 }).await()
+            val oddRes = collapseAsync(collapsedMap.filterValues { it.first().hashCode() % 2 != 0 }).await()
+            return evenRes + oddRes
+        }
+
+        fun collapseAsync(collapsedMap: Map<Field, List<Address>>): Deferred<Map<Field, List<Address>>> {
+            return async(CommonPool) {
+                return@async collapsedMap.map { toCollapsedMap(it.key, it.value) }
+                        .flatten()
+                        .toMap()
+            }
+        }
+
+        fun collapseSync(collapsedMap: Map<Field, List<Address>>): Map<Field, List<Address>> {
+            return collapsedMap.map { toCollapsedMap(it.key, it.value) }
+                    .flatten()
+                    .toMap()
         }
 
         /**
